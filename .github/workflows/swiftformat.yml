@@ -12,6 +12,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Cache SwiftFormat
+      id: cache-swiftformat
       uses: actions/cache@v2
       with:
         path: |
@@ -21,7 +22,7 @@ jobs:
           swiftformat-${{ hashFiles('**/*.swift') }}-
 
     - name: Install SwiftFormat
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: steps.cache-swiftformat.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/nicklockwood/SwiftFormat.git
         cd SwiftFormat
