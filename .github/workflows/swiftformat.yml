@@ -1,0 +1,32 @@
+name: SwiftFormat Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+jobs:
+  swiftformat-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Swift
+      run: |
+        sudo apt-get install clang libicu-dev
+        wget https://swift.org/builds/swift-5.3-release/ubuntu2004/swift-5.3-RELEASE/swift-5.3-RELEASE-ubuntu20.04.tar.gz
+        tar xzf swift-5.3-RELEASE-ubuntu20.04.tar.gz
+        echo "SWIFT_PATH=$(pwd)/swift-5.3-RELEASE-ubuntu20.04/usr/bin" >> $GITHUB_ENV
+
+    - name: Install SwiftFormat
+      run: |
+        git clone https://github.com/nicklockwood/SwiftFormat.git
+        cd SwiftFormat
+        swift build -c release
+
+    - name: Run SwiftFormat --lint
+      run: |
+        export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
+        swiftformat --lint .
