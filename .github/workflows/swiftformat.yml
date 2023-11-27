@@ -24,11 +24,18 @@ jobs:
         cd SwiftFormat
         swift build -c release
 
-    - name: Run SwiftFormat --lint
+    - name: Run SwiftFormat (Lint Mode)
+      id: lint
       run: |
         export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
         RESULT=$(swiftformat --lint . 2>&1) || true
-        if [ -n "$RESULT" ]; then
-          echo "SwiftFormat lint issues found:"
-          echo "$RESULT"
-        fi
+        echo "::set-output name=lint-result::$RESULT"
+    
+    - name: Comment Lint Issues on PR
+      if: steps.lint.outputs.lint-result != ''
+      uses: unsplash/comment-on-pr@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        msg: ${{ steps.lint.outputs.lint-result }}
+        check_for_duplicate_msg: true
