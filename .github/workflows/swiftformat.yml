@@ -27,7 +27,7 @@ jobs:
     - name: Run SwiftFormat --lint
       run: |
         export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
-        RESULT=$(swiftformat --lint . 2>&1)
+        RESULT=$(swiftformat --lint . 2>&1) || true
         if [ -n "$RESULT" ]; then
           echo "SwiftFormat lint issues found:"
           echo "$RESULT"
