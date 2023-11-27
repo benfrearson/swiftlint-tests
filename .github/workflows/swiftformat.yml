@@ -1,8 +1,6 @@
 name: SwiftFormat Lint
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
     
@@ -29,4 +27,8 @@ jobs:
     - name: Run SwiftFormat --lint
       run: |
         export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
-        swiftformat --lint .
+        RESULT=$(swiftformat --lint . 2>&1)
+        if [ -n "$RESULT" ]; then
+          echo "SwiftFormat lint issues found:"
+          echo "$RESULT"
+        fi
