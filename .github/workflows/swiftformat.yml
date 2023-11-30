@@ -34,9 +34,10 @@ jobs:
         export PATH="$GITHUB_WORKSPACE/SwiftFormat/.build/release:$PATH"
         RESULT=$(swiftformat --lint . 2>&1) || true
         if [ -n "$RESULT" ]; then
-          echo "::error::SwiftFormat lint issues found"
-          echo "$RESULT"
-          echo "lint-result=$RESULT" >> $GITHUB_ENV
+          echo "$RESULT" > swiftformat-output.txt
+          echo "lint-result<<EOF" >> $GITHUB_ENV
+          cat swiftformat-output.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         fi
     
     - name: Comment Lint Issues on PR
