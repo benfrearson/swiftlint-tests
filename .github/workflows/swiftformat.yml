@@ -16,7 +16,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          path/to/your/swiftformat
+          SwiftFormat
         key: swiftformat-${{ hashFiles('**/*.swift') }}-${{ github.run_number }}
         restore-keys: |
           swiftformat-${{ hashFiles('**/*.swift') }}-
@@ -31,15 +31,20 @@ jobs:
     - name: Run SwiftFormat (Lint Mode)
       id: lint
       run: |
-        export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
+        export PATH="$GITHUB_WORKSPACE/SwiftFormat/.build/release:$PATH"
         RESULT=$(swiftformat --lint . 2>&1) || true
-        echo "::set-output name=lint-result::$RESULT"
+        if [ -n "$RESULT" ]; then
+          echo "::error::SwiftFormat lint issues found"
+          echo "$RESULT"
+          echo "lint-result=$RESULT" >> $GITHUB_ENV
+        fi
     
     - name: Comment Lint Issues on PR
-      if: steps.lint.outputs.lint-result != ''
+      if: env.lint-result != ''
       uses: unsplash/comment-on-pr@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        msg: ${{ steps.lint.outputs.lint-result }}
+        msg: "${{ env.lint-result }}"
         check_for_duplicate_msg: true
+
