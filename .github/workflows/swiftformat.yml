@@ -29,23 +29,18 @@ jobs:
         swift build -c release
 
     - name: Run SwiftFormat (Lint Mode)
-      id: lint
       run: |
-        export PATH="$GITHUB_WORKSPACE/SwiftFormat/.build/release:$PATH"
-        RESULT=$(swiftformat --lint . 2>&1) || true
-        if [ -n "$RESULT" ]; then
-          echo "$RESULT" > swiftformat-output.txt
-          echo "lint-result<<EOF" >> $GITHUB_ENV
-          cat swiftformat-output.txt >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-        fi
+        swiftformat --lint . > swiftformat-output.txt || true
     
     - name: Comment Lint Issues on PR
-      if: env.lint-result != ''
+      if: steps.lint.outputs.lint-result != ''
       uses: unsplash/comment-on-pr@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        msg: "${{ env.lint-result }}"
-        check_for_duplicate_msg: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        msg: |
+          SwiftFormat Lint Issues:
+          ```
+          $(cat swiftformat-output.txt)
+          ```
+
 
