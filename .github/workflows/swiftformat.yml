@@ -23,9 +23,10 @@ jobs:
       run: |
         export PATH="$(pwd)/SwiftFormat/.build/release:$PATH"
         swiftformat --lint . > swiftformat-output.txt || true
+        echo swiftformat-output.txt
 
     - name: Comment Lint Issues on PR
-      if: steps.lint.outputs.lint-result != ''
+      # if: steps.lint.outputs.lint-result != ''
       uses: unsplash/comment-on-pr@master
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
