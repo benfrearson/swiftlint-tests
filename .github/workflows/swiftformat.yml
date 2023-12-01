@@ -1,46 +1,28 @@
-name: SwiftFormat Lint
+name: SwiftLint
 
 on:
   pull_request:
-    branches: [ main ]
-    
+    paths:
+      - '.github/workflows/swiftlint.yml'
+      - '.swiftlint.yml'
+      - '**/*.swift'
+
 jobs:
-  swiftformat-lint:
+  SwiftLint:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Cache SwiftFormat
-      id: cache-swiftformat
-      uses: actions/cache@v2
-      with:
-        path: |
-          SwiftFormat
-        key: swiftformat-${{ hashFiles('**/*.swift') }}-${{ github.run_number }}
-        restore-keys: |
-          swiftformat-${{ hashFiles('**/*.swift') }}-
-
-    - name: Install SwiftFormat
-      if: steps.cache-swiftformat.outputs.cache-hit != 'true'
-      run: |
-        git clone https://github.com/nicklockwood/SwiftFormat.git
-        cd SwiftFormat
-        swift build -c release
-
-    - name: Run SwiftFormat (Lint Mode)
-      run: |
-        swiftformat --lint . > swiftformat-output.txt || true
-    
-    - name: Comment Lint Issues on PR
-      if: steps.lint.outputs.lint-result != ''
-      uses: unsplash/comment-on-pr@master
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        msg: |
-          SwiftFormat Lint Issues:
-          ```
-          $(cat swiftformat-output.txt)
-          ```
-
-
+      - uses: actions/checkout@v1
+      - name: GitHub Action for SwiftLint
+        uses: norio-nomura/action-swiftlint@3.2.1
+      - name: GitHub Action for SwiftLint with --strict
+        uses: norio-nomura/action-swiftlint@3.2.1
+        with:
+          args: --strict
+      - name: GitHub Action for SwiftLint (Only files changed in the PR)
+        uses: norio-nomura/action-swiftlint@3.2.1
+        env:
+          DIFF_BASE: ${{ github.base_ref }}
+      - name: GitHub Action for SwiftLint (Different working directory)
+        uses: norio-nomura/action-swiftlint@3.2.1
+        env:
+          WORKING_DIRECTORY: Source
