@@ -16,7 +16,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          path/to/your/swiftformat
+          SwiftFormat/.build
         key: swiftformat-${{ hashFiles('**/*.swift') }}-${{ github.run_number }}
         restore-keys: |
           swiftformat-${{ hashFiles('**/*.swift') }}-
