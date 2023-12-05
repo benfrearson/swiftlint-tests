@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ContentView:View {
-    var body:some View {
-        //squished comment
+struct ContentView: View {
+    var body: some View {
+        // squished comment
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
