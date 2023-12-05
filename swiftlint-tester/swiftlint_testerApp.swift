@@ -8,9 +8,9 @@
 import SwiftUI
 
 @main
-//swiftlint:disable:next type_name
+// swiftlint:disable:next type_name
 struct swiftlint_testerApp: App {
-    var body:some Scene {
+    var body: some Scene {
         WindowGroup {
             ContentView()
         }
