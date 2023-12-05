@@ -22,9 +22,9 @@ jobs:
         key: swiftformat-${{ hashFiles('**/*.swift') }}-${{ github.run_number }}
         restore-keys: |
           swiftformat-${{ hashFiles('**/*.swift') }}-
-
-    - name: Install SwiftFormat
-      if: steps.cache-swiftformat.outputs.cache-hit != 'true'
+    
+    - if: steps.cache-swiftformat.outputs.cache-hit != 'true'
+      name: Install SwiftFormat  
       run: |
         git clone https://github.com/nicklockwood/SwiftFormat.git
         cd SwiftFormat
