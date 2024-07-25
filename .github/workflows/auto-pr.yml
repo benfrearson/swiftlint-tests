@@ -1,36 +1,37 @@
 name: Create Pull Requests on changes to Development
 
 on:
-    pull_request:
-      types:
-        - closed
+  pull_request:
+    types:
+      - closed
 
 jobs:
-    merged_development_pr:
-      if:  ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
-      runs-on: ubuntu-latest
-      env:
-        PR_BRANCH: "auto/${{github.event.pull_request.head.ref}}-into-development"
-      steps:
+  merged_development_pr:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
+    runs-on: ubuntu-latest
+    env:
+      PR_BRANCH: "auto/${{github.event.pull_request.head.ref}}-into-development"
+    steps:
       - uses: actions/checkout@v4
         with:
-            ref: development
-      - name: Create PR branch
-        env:
-            GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT}} 
+          ref: development
+      - name: Determine Epic Branches
+        id: determine-branches
         run: |
-            git switch -C ${{env.PR_BRANCH}}
-            git push --set-upstream origin auto/auto-pr-into-development
-            gh pr create --base epic/epic1 --title "Auto PR" --body "Update epic/epic1 branch with changes on development"
-    #   - name: Create Pull Request
-    #     uses: peter-evans/create-pull-request@v6
-    #     with:
-    #         token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
-    #         branch: ${{ env.PR_BRANCH }}
-    #         base: epic/epic1
+          EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
+          echo "::set-output name=branches::${EPIC_BRANCHES}
+      - name: Create PRs for Epic Branches
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          IFS=$'\n'
+          for branch in ${{ steps.determine-branches.outputs.branches }}; do
+            PR_BRANCH="auto/${branch}-into-development"
+            git switch -C $PR_BRANCH
+            git push --set-upstream origin $PR_BRANCH
+            gh pr create --base $branch --head $PR_BRANCH --title "Auto PR: ${PR_BRANCH}" --body "Update $branch branch with changes on development"
+          done
 
-        
-
-#   if the PR is merged; 
+#   if the PR is merged;
 # create a new branch from the merged branch ref
-# 
+#
