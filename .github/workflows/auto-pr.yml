@@ -19,7 +19,7 @@ jobs:
         id: determine-branches
         run: |
           EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
-          echo "::set-output name=branches::${EPIC_BRANCHES}
+          echo "::set-output name=branches::${EPIC_BRANCHES}"
       - name: Create PRs for Epic Branches
         env:
           GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
