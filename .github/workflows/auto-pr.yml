@@ -19,7 +19,8 @@ jobs:
         id: determine-branches
         run: |
           EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
-          echo $(git branch)
+          echo "git remote branches"
+          echo $(git branch -r)
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
