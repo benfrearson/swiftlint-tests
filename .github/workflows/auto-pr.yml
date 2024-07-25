@@ -46,14 +46,16 @@ jobs:
             PR_BRANCH="auto/${{ github.event.pull_request.base.ref }}#release-into-release-${branch#release/}"
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
-            BODY_TEXT=""
-            >[!IMPORTANT]
+            BODY_TEXT=$(cat <<EOF
+             >[!IMPORTANT]
             > This PR was created automatically by a Github Action.
             > Please review merge conflicts carefully and only merge if the changes are required in this branch.
 
             Update $branch branch with changes on release branch ${{ github.event.pull_request.base.ref }}.
             This branch appears to be ahead of the release branch, and therefore may require updating with the latest changes.
-            "
+            EOF
+            )
+            
             gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body $BODY_TEXT
           done
 
@@ -66,7 +68,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
             ref: development
-            
+
       - name: Determine Epic Branches
         id: determine-branches
         run: |
@@ -88,12 +90,14 @@ jobs:
             PR_BRANCH="auto/development-into-${branch}"
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
-            BODY_TEXT="
-            Update $branch branch with changes on development.
-
+            BODY_TEXT=$(cat <<EOF
             >[!IMPORTANT]
             > This PR was created automatically by a Github Action.
             > Please review merge conflicts carefully and only merge if the changes are required in this branch.
-            "
+            
+            Update $branch branch with changes on development.
+            EOF
+            )
+
             gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body $BODY_TEXT
           done
