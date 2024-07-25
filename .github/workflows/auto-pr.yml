@@ -33,7 +33,7 @@ jobs:
             fi
           done
 
-          echo "EPIC_BRANCHES<<EOF" >> $GITHUB_ENV
+          echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
             
