@@ -20,7 +20,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
             branch: $PR_BRANCH
-            token: ${{ secrets.ADD_TO_PROJECT_PAT}}
+            token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
         
 
 #   if the PR is merged; 
