@@ -15,11 +15,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: development
-
       - name: Determine Epic Branches
         id: determine-branches
         run: |
           EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
+          echo $(git branch)
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
