@@ -7,11 +7,11 @@ on:
 
 jobs:
     merged_development_pr:
-      if:  ${{ github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'development' }}
+      if:  ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
       runs-on: ubuntu-latest
       env:
-        REF: ${{github.event.pull_request.head.base.ref}}
-        PR_BRANCH: "auto/${{github.event.pull_request.base.ref}}-into-development"
+        REF: ${{github.event.pull_request.head.ref}}
+        PR_BRANCH: "auto/${{github.event.pull_request.head.ref}}-into-development"
       steps:
       - uses: actions/checkout@v4
         with:
