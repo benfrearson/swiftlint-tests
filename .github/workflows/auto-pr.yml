@@ -15,7 +15,7 @@ jobs:
       steps:
       - uses: actions/checkout@v4
         with:
-            ref: $REF
+            ref: ${{REF}}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
