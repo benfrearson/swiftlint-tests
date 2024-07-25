@@ -1,0 +1,92 @@
+name: Create Pull Requests on changes to Development
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  merged_release_pr:
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Determine Higher Version Release Branches
+        id: determine-branches
+        run: |
+          BASE_REF=${{ github.event.pull_request.base.ref }}
+          BASE_VERSION=${BASE_REF#release/}
+          
+          # Function to compare versions
+          version_gt() {
+            [ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]
+          }
+
+          EPIC_BRANCHES="development"
+          for branch in $(git branch -r | grep -o 'origin/release/[^ ]*' | sed 's|origin/||'); do
+            BRANCH_VERSION=${branch#release/}
+            if version_gt $BRANCH_VERSION $BASE_VERSION; then
+              EPIC_BRANCHES="$EPIC_BRANCHES $branch"
+            fi
+          done
+
+          echo "EPIC_BRANCHES<<EOF" >> $GITHUB_ENV
+          echo "$EPIC_BRANCHES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+            
+      - name: Create PRs for Epic Branches
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          IFS=$'\n'
+          for branch in $BRANCHES; do
+            PR_BRANCH="auto/${{ github.event.pull_request.base.ref }}#release-into-release-${branch#release/}"
+            git switch -C $PR_BRANCH
+            git push --set-upstream origin $PR_BRANCH
+            BODY_TEXT=">[\\!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on release branch ${{ github.event.pull_request.base.ref }}.\n\nThis branch appears to be ahead of the release branch, and therefore may require updating with the latest changes.."
+      
+            BODY_TEXT=$(echo -e "$BODY_TEXT")
+            
+            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body $BODY_TEXT
+          done
+
+
+
+  merged_development_pr:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            ref: development
+
+      - name: Determine Epic Branches
+        id: determine-branches
+        run: |
+          git fetch
+
+          EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
+          echo "git remote branches"
+          echo $(git branch -r)
+          echo "BRANCHES<<EOF" >> $GITHUB_ENV
+          echo "$EPIC_BRANCHES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create PRs for Epic Branches
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          IFS=$'\n'
+          for branch in $BRANCHES; do
+            PR_BRANCH="auto/development-into-${branch}"
+            git switch -C $PR_BRANCH
+            git push --set-upstream origin $PR_BRANCH
+            BODY_TEXT=">[\\!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on development."
+      
+            BODY_TEXT=$(echo -e "$BODY_TEXT")
+
+            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "$BODY_TEXT"
+          done
