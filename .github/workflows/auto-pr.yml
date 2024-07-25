@@ -18,12 +18,14 @@ jobs:
       - name: Create PR branch
         run: |
             git switch -C ${{env.PR_BRANCH}}
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-            token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
-            branch: ${{ env.PR_BRANCH }}
-            base: epic/epic1
+            git push 
+            gh pr create --base epic/epic1 --title "Auto PR""
+    #   - name: Create Pull Request
+    #     uses: peter-evans/create-pull-request@v6
+    #     with:
+    #         token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
+    #         branch: ${{ env.PR_BRANCH }}
+    #         base: epic/epic1
 
         
 
