@@ -10,6 +10,10 @@ jobs:
     if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/') }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+            ref: ${{ github.event.pull_request.base.ref }}
+
       - name: Determine Higher Version Release Branches
         id: determine-branches
         run: |
@@ -32,10 +36,6 @@ jobs:
           echo "EPIC_BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-        with:
-            ref: ${{ github.event.pull_request.base.ref }}
             
       - name: Create PRs for Epic Branches
         env:
@@ -63,6 +63,10 @@ jobs:
     if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+            ref: development
+            
       - name: Determine Epic Branches
         id: determine-branches
         run: |
@@ -74,10 +78,6 @@ jobs:
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-        with:
-            ref: development
 
       - name: Create PRs for Epic Branches
         env:
