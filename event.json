@@ -1,10 +1,10 @@
 {
   "pull_request": {
     "head": {
-      "ref": "development"
+      "ref": "test/test1"
     },
     "base": {
-      "ref": "test/test1"
+      "ref": "development"
     },
     "merged":true
   }

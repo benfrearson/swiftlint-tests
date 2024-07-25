@@ -18,8 +18,9 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-            branch: $PR_BRANCH
             token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
+            branch: ${PR_BRANCH}
+
         
 
 #   if the PR is merged; 
