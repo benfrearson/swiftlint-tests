@@ -99,5 +99,5 @@ jobs:
             EOF
             )
 
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body $BODY_TEXT
+            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "$BODY_TEXT"
           done
