@@ -1,0 +1,28 @@
+name: Create Pull Requests on changes to Development
+
+on:
+    pull_request:
+      types:
+        - closed
+
+jobs:
+    merged_development_pr:
+      if:  ${{ github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'development' }}
+      runs-on: ubuntu-latest
+      env:
+        REF: ${{github.event.pull_request.head.base.ref}}
+        PR_BRANCH: "auto/${{github.event.pull_request.base.ref}}-into-development"
+      steps:
+      - uses: actions/checkout@v4
+        with:
+            ref: $REF
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+            branch: $PR_BRANCH
+            token: ${{ secrets.ADD_TO_PROJECT_PAT}}
+        
+
+#   if the PR is merged; 
+# create a new branch from the merged branch ref
+# 

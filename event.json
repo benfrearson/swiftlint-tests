@@ -1,0 +1,12 @@
+{
+  "pull_request": {
+    "head": {
+      "ref": "development"
+    },
+    "base": {
+      "ref": "test/test1"
+    },
+    "merged":true
+  }
+}
+
