@@ -90,14 +90,7 @@ jobs:
             PR_BRANCH="auto/development-into-${branch}"
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
-            BODY_TEXT=$(cat <<EOF
-            >[!IMPORTANT]
-            > This PR was created automatically by a Github Action.
-            > Please review merge conflicts carefully and only merge if the changes are required in this branch.
-            
-            Update $branch branch with changes on development.
-            EOF
-            )
+            BODY_TEXT=">[!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on development."
 
             gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "$BODY_TEXT"
           done
