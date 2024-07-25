@@ -18,6 +18,8 @@ jobs:
       - name: Determine Epic Branches
         id: determine-branches
         run: |
+          git fetch
+
           EPIC_BRANCHES=$(git branch -r | grep -o 'origin/epic/[^ ]*' | sed 's|origin/||')
           echo "git remote branches"
           echo $(git branch -r)
