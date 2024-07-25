@@ -19,7 +19,7 @@ jobs:
         run: |
             git switch -C ${{env.PR_BRANCH}}
             git push --set-upstream origin auto/auto-pr-into-development
-            gh pr create --base epic/epic1 --title "Auto PR""
+            gh pr create --base epic/epic1 --title "Auto PR"
     #   - name: Create Pull Request
     #     uses: peter-evans/create-pull-request@v6
     #     with:
