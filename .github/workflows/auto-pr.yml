@@ -19,7 +19,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
             token: ${{ secrets.ADD_TO_PROJECT_PAT}} 
-            branch: ${PR_BRANCH}
+            branch: ${{ env.PR_BRANCH }}
 
         
 
