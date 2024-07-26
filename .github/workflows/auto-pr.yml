@@ -27,7 +27,7 @@ jobs:
             [ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]
           }
 
-          EPIC_BRANCHES="development"
+          EPIC_BRANCHES=""
           for branch in $(git branch -r | grep -o 'origin/release/[^ ]*' | sed 's|origin/||'); do
             BRANCH_VERSION=${branch#release/}
             if version_gt $BRANCH_VERSION $BASE_VERSION; then
@@ -36,6 +36,7 @@ jobs:
           done
 
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
+          echo "development" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
             
