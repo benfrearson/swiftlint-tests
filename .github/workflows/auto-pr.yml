@@ -60,7 +60,7 @@ jobs:
       
             BODY_TEXT=$(echo -e "$BODY_TEXT")
             
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "${BODY_TEXT}"
+            gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "${BODY_TEXT}" --label "auto-pr"
           done
 
 
@@ -98,5 +98,5 @@ jobs:
       
             BODY_TEXT=$(echo -e "$BODY_TEXT")
 
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "$BODY_TEXT"
+            gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "$BODY_TEXT" --label "auto-pr"
           done
