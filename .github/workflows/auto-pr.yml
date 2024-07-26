@@ -31,13 +31,13 @@ jobs:
           for branch in $(git branch -r | grep -o 'origin/release/[^ ]*' | sed 's|origin/||'); do
             BRANCH_VERSION=${branch#release/}
             if version_gt $BRANCH_VERSION $BASE_VERSION; then
-              EPIC_BRANCHES="$EPIC_BRANCHES $branch"
+              EPIC_BRANCHES="$EPIC_BRANCHES\n$branch"
             fi
           done
 
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "development" >> $GITHUB_ENV
-          echo "$EPIC_BRANCHES" >> $GITHUB_ENV
+          echo -e "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
             
       - name: Create PRs for Epic Branches
