@@ -17,6 +17,8 @@ jobs:
       - name: Determine Higher Version Release Branches
         id: determine-branches
         run: |
+          git fetch
+
           BASE_REF=${{ github.event.pull_request.base.ref }}
           BASE_VERSION=${BASE_REF#release/}
           
@@ -41,16 +43,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
         run: |
+          echo "Creating PRs for branches $BRANCHES"
+          
+          # Base branch for initially triggered PR
+          ORIGINAL_BASE_REF=${{ github.event.pull_request.base.ref }}
+          ORIGINAL_BASE_NAME=${ORIGINAL_BASE_REF//\//-}
+
+
           IFS=$'\n'
           for branch in $BRANCHES; do
-            PR_BRANCH="auto/${{ github.event.pull_request.base.ref }}#release-into-release-${branch#release/}"
+            PR_BRANCH="auto/${ORIGINAL_BASE_NAME}-into-${branch//\//-}"
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
             BODY_TEXT=">[\\!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on release branch ${{ github.event.pull_request.base.ref }}.\n\nThis branch appears to be ahead of the release branch, and therefore may require updating with the latest changes."
       
             BODY_TEXT=$(echo -e "$BODY_TEXT")
             
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body $"BODY_TEXT"
+            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "${BODY_TEXT}"
           done
 
 
