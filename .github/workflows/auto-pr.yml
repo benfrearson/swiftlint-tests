@@ -12,7 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: ${{ github.event.pull_request.base.ref }}
+          ref: ${{ github.event.pull_request.base.ref }}
+          token: ${{ secrets.ADD_TO_PROJECT_PAT }}
 
       - name: Determine Higher Version Release Branches
         id: determine-branches
@@ -21,7 +22,7 @@ jobs:
 
           BASE_REF=${{ github.event.pull_request.base.ref }}
           BASE_VERSION=${BASE_REF#release/}
-          
+
           # Function to compare versions
           version_gt() {
             [ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]
@@ -39,13 +40,25 @@ jobs:
           echo "development" >> $GITHUB_ENV
           echo -e "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-      - uses: ./.github/workflows/create-label.yml
+      - name: Create auto-pr label
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          LABEL_NAME="auto-pr"
+          LABEL_EXISTS=$(gh label list --json name --jq ".[] | select(.name == \"$LABEL_NAME\") | .name")
+
+          if [ -z "$LABEL_EXISTS" ]; then
+            gh label create "$LABEL_NAME" --description "Label for automatically created PRs" --color "#1d76db"
+            echo "Label '$LABEL_NAME' created."
+          else
+            echo "Label '$LABEL_NAME' already exists."
+          fi
       - name: Create PRs for Epic Branches
         env:
           GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
         run: |
           echo "Creating PRs for branches $BRANCHES"
-          
+
           # Base branch for initially triggered PR
           ORIGINAL_BASE_REF=${{ github.event.pull_request.base.ref }}
           ORIGINAL_BASE_NAME=${ORIGINAL_BASE_REF//\//-}
@@ -57,13 +70,11 @@ jobs:
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
             BODY_TEXT=">[\\!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on release branch ${{ github.event.pull_request.base.ref }}.\n\nThis branch appears to be ahead of the release branch, and therefore may require updating with the latest changes."
-      
+
             BODY_TEXT=$(echo -e "$BODY_TEXT")
             
             gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "${BODY_TEXT}" --label "auto-pr"
           done
-
-
 
   merged_development_pr:
     if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' }}
@@ -71,7 +82,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: development
+          ref: development
+          token: ${{ secrets.ADD_TO_PROJECT_PAT }}
 
       - name: Determine Epic Branches
         id: determine-branches
@@ -84,7 +96,19 @@ jobs:
           echo "BRANCHES<<EOF" >> $GITHUB_ENV
           echo "$EPIC_BRANCHES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+      - name: Create auto-pr label
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          LABEL_NAME="auto-pr"
+          LABEL_EXISTS=$(gh label list --json name --jq ".[] | select(.name == \"$LABEL_NAME\") | .name")
 
+          if [ -z "$LABEL_EXISTS" ]; then
+            gh label create "$LABEL_NAME" --description "Label for automatically created PRs" --color "#1d76db"
+            echo "Label '$LABEL_NAME' created."
+          else
+            echo "Label '$LABEL_NAME' already exists."
+          fi
       - name: Create PRs for Epic Branches
         env:
           GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
@@ -95,7 +119,7 @@ jobs:
             git switch -C $PR_BRANCH
             git push --set-upstream origin $PR_BRANCH
             BODY_TEXT=">[\\!IMPORTANT]\n> This PR was created automatically by a Github Action.\n> Please review merge conflicts carefully and only merge if the changes are required in this branch.\n\nUpdate $branch branch with changes on development."
-      
+
             BODY_TEXT=$(echo -e "$BODY_TEXT")
 
             gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "$BODY_TEXT" --label "auto-pr"
