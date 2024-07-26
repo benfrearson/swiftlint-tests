@@ -7,7 +7,7 @@ on:
 
 jobs:
   merged_release_pr:
-    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/') }}
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/') && !startsWith(github.event.pull_request.head.ref, 'auto')}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
       
             BODY_TEXT=$(echo -e "$BODY_TEXT")
             
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "${BODY_TEXT}"
+            gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "${BODY_TEXT}" --label "auto-pr"
           done
 
 
@@ -98,5 +98,5 @@ jobs:
       
             BODY_TEXT=$(echo -e "$BODY_TEXT")
 
-            gh pr create --base $branch --head $PR_BRANCH --title "auto-PR: ${PR_BRANCH}" --body "$BODY_TEXT"
+            gh pr create --base $branch --head $PR_BRANCH --title "${PR_BRANCH}" --body "$BODY_TEXT" --label "auto-pr"
           done
