@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.ref }}
-          token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Determine Higher Version Release Branches
         id: determine-branches
@@ -42,7 +42,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
       - name: Create auto-pr label
         env:
-          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           LABEL_NAME="auto-pr"
           LABEL_EXISTS=$(gh label list --json name --jq ".[] | select(.name == \"$LABEL_NAME\") | .name")
@@ -55,7 +55,7 @@ jobs:
           fi
       - name: Create PRs for Epic Branches
         env:
-          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Creating PRs for branches $BRANCHES"
 
